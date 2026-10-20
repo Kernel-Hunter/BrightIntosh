@@ -10,12 +10,15 @@ import SwiftUI
 struct KeysSettingsView: View {
     @ObservedObject private var settings = KeysSettings.shared
     @State private var confirmReset = false
+    @State private var refreshMessage: String?
+    @State private var refreshing = false
 
     var body: some View {
         Form {
             keysSection
             popupSection
             accessibilitySection
+            maintenanceSection
 
             Section {
                 HStack {
@@ -161,6 +164,48 @@ struct KeysSettingsView: View {
             Toggle("Always show a border around the popup", isOn: $settings.highContrastBorder)
             Toggle("Announce brightness with VoiceOver", isOn: $settings.announceWithVoiceOver)
         }
+    }
+
+    // MARK: Maintenance
+
+    private var maintenanceSection: some View {
+        Section(header: Text("Maintenance").bold()) {
+            HStack {
+                Button {
+                    refreshing = true
+                    BrightnessKeys.shared.refresh { report in
+                        refreshing = false
+                        refreshMessage = describe(report)
+                    }
+                } label: {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }
+                .disabled(refreshing)
+                if let refreshMessage {
+                    Text(refreshMessage)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Text("Restarts the key listener and the extra brightness. Use it if the keys or the boost stop working, for example after a wake from sleep. It also runs by itself after every wake and at login.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func describe(_ report: BrightnessKeys.RefreshReport) -> String {
+        if !report.accessibilityGranted {
+            return String(localized: "Accessibility access is missing. Grant it in System Settings.")
+        }
+        if !report.builtInDisplayFound {
+            return String(localized: "No built-in display found.")
+        }
+        if !report.tapRunning {
+            return String(localized: "The key listener did not start. Try again.")
+        }
+        return report.boostRequested
+            ? String(localized: "Refreshed. Keys and boost are running.")
+            : String(localized: "Refreshed. The keys work, but increased brightness is switched off.")
     }
 
     // MARK: Helpers

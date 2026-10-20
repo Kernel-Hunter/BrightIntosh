@@ -96,6 +96,10 @@ class StatusBarMenu : NSObject, NSMenuDelegate {
         settingsItem.setShortcut(for: .openSettings)
         settingsItem.target = self
         
+        let refreshItem = NSMenuItem(title: String(localized: "Refresh"), action: #selector(refreshKeys), keyEquivalent: "")
+        refreshItem.image = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: String(localized: "Refresh"))
+        refreshItem.target = self
+
         let aboutUsItem = NSMenuItem(title: String(localized: "About us"), action: #selector(openLegalNotice), keyEquivalent: "")
         aboutUsItem.target = self
         
@@ -116,6 +120,9 @@ class StatusBarMenu : NSObject, NSMenuDelegate {
 #endif
         menu.addItem(NSMenuItem.separator())
         menu.addItem(settingsItem)
+        #if !STORE
+        menu.addItem(refreshItem)
+        #endif
         menu.addItem(helpItem)
         menu.addItem(aboutUsItem)
         menu.addItem(quitItem)
@@ -597,6 +604,12 @@ class StatusBarMenu : NSObject, NSMenuDelegate {
         exit(0)
     }
     
+    @objc func refreshKeys() {
+        #if !STORE
+        BrightnessKeys.shared.refresh { _ in }
+        #endif
+    }
+
     @objc func openSettings() {
         NSApplication.shared.activate(ignoringOtherApps: true)
         settingsWindowController.showWindow(self)

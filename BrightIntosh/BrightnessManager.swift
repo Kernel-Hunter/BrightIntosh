@@ -23,6 +23,7 @@ protocol BrightnessManaging: AnyObject {
     func protectedDataWillBecomeUnavailable()
     func protectedDataDidBecomeAvailable()
     func applyBoostFast(_ boost: Float) -> Bool
+    func refresh()
 }
 
 @MainActor
@@ -576,6 +577,11 @@ final class BrightnessManager: BrightnessManaging {
         } else if stabilizationTask == nil {
             activateImmediately(reason: "display preference changed")
         }
+    }
+
+    /// Re-engages the boost from scratch, for the manual refresh action.
+    func refresh() {
+        restartBrightnessTechnique(reason: "manual refresh")
     }
 
     func applyBoostFast(_ boost: Float) -> Bool {

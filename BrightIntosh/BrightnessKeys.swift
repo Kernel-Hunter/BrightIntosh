@@ -43,6 +43,7 @@ final class BrightnessKeys: NSObject {
 
     nonisolated private static let gate = KeyGate()
     nonisolated(unsafe) private static var tapPort: CFMachPort?
+    nonisolated(unsafe) private static var tapRunLoop: CFRunLoop?
 
     private let settings = KeysSettings.shared
     private weak var manager: (any BrightnessManaging)?
@@ -50,6 +51,7 @@ final class BrightnessKeys: NSObject {
     private var promptedForAccess = false
     private var warnedAboutAccess = false
     private var cancellables = Set<AnyCancellable>()
+    private var recoveryTask: Task<Void, Never>?
 
     private let displayServices = DisplayServicesBridge()
     private let hud = BrightnessHUD()
@@ -95,10 +97,108 @@ final class BrightnessKeys: NSObject {
         ) { _ in MainActor.assumeIsolated { self.refreshGate() } }
         refreshGate()
 
+        restartTap()
+        observeSystemEvents()
+        // At login the displays and the HDR state can still be settling.
+        scheduleRecovery(reason: "launch")
+    }
+
+    // MARK: Recovery and refresh
+
+    struct RefreshReport {
+        var accessibilityGranted: Bool
+        var tapRunning: Bool
+        var builtInDisplayFound: Bool
+        var boostRequested: Bool
+    }
+
+    /// Rebuilds everything the keys depend on: the event tap, the gate, the
+    /// cached levels and the boost itself. Reports once the tap has restarted.
+    func refresh(completion: @escaping (RefreshReport) -> Void) {
+        keysLog.notice("Manual refresh")
+        stopRamp()
+        resetCachedState()
+        restartTap()
+        refreshGate()
+        manager?.refresh()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { completion(self.report()) }
+    }
+
+    private func report() -> RefreshReport {
+        RefreshReport(
+            accessibilityGranted: AXIsProcessTrusted(),
+            tapRunning: Self.tapPort.map { CGEvent.tapIsEnabled(tap: $0) } ?? false,
+            builtInDisplayFound: builtInDisplayId() != nil,
+            boostRequested: BrightIntoshSettings.shared.brightintoshActive
+        )
+    }
+
+    private func observeSystemEvents() {
+        let center = NSWorkspace.shared.notificationCenter
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification] {
+            center.addObserver(forName: name, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated { self.stopRamp() }
+            }
+        }
+        let wakeReasons: [(Notification.Name, String)] = [
+            (NSWorkspace.didWakeNotification, "system woke"),
+            (NSWorkspace.screensDidWakeNotification, "screens woke"),
+            (NSWorkspace.sessionDidBecomeActiveNotification, "session became active"),
+        ]
+        for (name, reason) in wakeReasons {
+            center.addObserver(forName: name, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated { self.scheduleRecovery(reason: reason) }
+            }
+        }
+    }
+
+    /// Checks a few times after a wake or login, because displays come back
+    /// in stages and macOS can disable the event tap while it is asleep.
+    private func scheduleRecovery(reason: String) {
+        recoveryTask?.cancel()
+        recoveryTask = Task { @MainActor in
+            for delay in [1.0, 4.0, 10.0] {
+                try? await Task.sleep(for: .seconds(delay))
+                guard !Task.isCancelled else { return }
+                keysLog.notice("Recovery check after \(reason, privacy: .public)")
+                resetCachedState()
+                ensureTap()
+                refreshGate()
+            }
+        }
+    }
+
+    private func resetCachedState() {
+        lastLevel = -1
+        lastBoost = -1
+        if link == nil && fallbackTimer == nil {
+            currentNits = 0
+            targetNits = 0
+        }
+    }
+
+    private func ensureTap() {
+        if let port = Self.tapPort, CGEvent.tapIsEnabled(tap: port) { return }
+        keysLog.notice("Event tap not running, restarting")
+        restartTap()
+    }
+
+    private func restartTap() {
+        Self.stopTap()
         let thread = Thread { Self.runTap() }
         thread.name = "BrightnessKeys.tap"
         thread.qualityOfService = .userInteractive
         thread.start()
+    }
+
+    nonisolated private static func stopTap() {
+        if let port = tapPort {
+            CGEvent.tapEnable(tap: port, enable: false)
+            CFMachPortInvalidate(port)
+        }
+        if let runLoop = tapRunLoop { CFRunLoopStop(runLoop) }
+        tapPort = nil
+        tapRunLoop = nil
     }
 
     /// Shows the popup with the current state, for the settings preview.
@@ -177,6 +277,7 @@ final class BrightnessKeys: NSObject {
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0)
         CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
         CGEvent.tapEnable(tap: port, enable: true)
+        tapRunLoop = CFRunLoopGetCurrent()
         CFRunLoopRun()
     }
 

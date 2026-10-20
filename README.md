@@ -47,6 +47,8 @@ On first launch, grant Accessibility access in System Settings, under Privacy & 
 
 Press the brightness keys as usual. Hold Shift and Option for smaller steps. Settings has a Keys & Popup tab, and its Preview button shows the popup without pressing a key.
 
+If the keys or the boost stop working, use Refresh in the menu bar menu or in Settings. The app also checks itself after every wake from sleep and at login. To start it at login, turn on Launch on login in the General tab.
+
 The default boost step is 100 nits per press. Lower it for finer control, for example 10 or 20 nits.
 
 ## How accurate are the nits?

@@ -14,6 +14,9 @@ All notable changes to this fork. The format follows [Keep a Changelog](https://
 - `BrightnessCurve` model with unit tests (`swift test`).
 - GitHub Actions workflow that runs the tests and builds the app.
 
+- Recovery after sleep, wake and login: the key listener and the cached levels are checked again 1, 4 and 10 seconds after a wake or launch, and the event tap is restarted if macOS disabled it.
+- Refresh button in the Keys & Popup tab and a Refresh item in the menu bar menu. It restarts the key listener and the extra brightness.
+
 ### Changed
 
 - The boost ceiling is now derived from the display headroom (`referenceEdr^(1/2.2) - 1`) instead of fixed constants, so the full boost matches the 1600 nit panel peak.
