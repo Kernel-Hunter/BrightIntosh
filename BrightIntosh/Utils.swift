@@ -204,15 +204,25 @@ func isDeviceSupported() -> Bool {
     return false
 }
 
+// Gamma tables scale the encoded signal, so light output grows as factor^boostEncodingGamma.
+// The panel peaks at `referenceEdr` x SDR white (about 1600 nits), which is reached at
+// factor = referenceEdr^(1/gamma). Going past that only clips highlights.
+let boostEncodingGamma: Float = 2.2
+let panelPeakNits: Float = 1600
+
+func boostFactorAtPeak(_ referenceEdr: Float) -> Float {
+    pow(referenceEdr, 1 / boostEncodingGamma) - 1
+}
+
 // Reference bonus gamma for a max EDR value
 func getScreenRefGamma(_ screen: NSScreen) -> (Float, Float) {
     if let displayId = screen.displayId, CGDisplayIsBuiltin(displayId) != 0 {
         if let device = getModelIdentifier(),
             sdr600nitsDevices.contains(device)
         {
-            return (2.66, 0.50)
+            return (2.66, boostFactorAtPeak(2.66))
         }
-        return (3.2, 0.59)
+        return (3.2, boostFactorAtPeak(3.2))
     }
     // Studio/Pro Display XDR
     return (2.66, 0.6)

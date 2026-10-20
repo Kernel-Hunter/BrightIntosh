@@ -169,7 +169,7 @@ final class GammaTechnique: BrightnessTechnique {
     private var gammaConflictChecksAllowedAfter = Date.distantPast
     private var nextGammaIntegrityCheck = Date.distantPast
     nonisolated private static let colorStateLock = NSLock()
-    private let gammaFadeDuration: TimeInterval = 0.2
+    private let gammaFadeDuration: TimeInterval = 0.1
     private let gammaFadeFrameInterval: Duration = .milliseconds(16)
     private let gammaFactorEpsilon: Float = 0.001
     private let upwardGammaStabilizationDelay: Duration = .milliseconds(1500)
@@ -348,6 +348,33 @@ final class GammaTechnique: BrightnessTechnique {
                 reason: reason
             )
         }
+    }
+
+    /// Applies the boost straight to the gamma table: no fade, no HDR bookkeeping.
+    /// Returns false when HDR is not ready so the caller can use the normal path.
+    func applyBoostFast(boost: Float) -> Bool {
+        guard isEnabled, !gammaTables.isEmpty else { return false }
+        var applied = false
+        for (displayId, gammaTable) in gammaTables {
+            guard let screen = screenForDisplay(displayId), hdrIsReady(screen) else { continue }
+            let currentEdr = screen.maximumExtendedDynamicRangeColorComponentValue
+            let (referenceEdr, maxScreenBrightness) = getScreenRefGamma(screen)
+            let factor = Self.gammaFactor(
+                userBrightness: boost,
+                maxScreenBrightness: maxScreenBrightness,
+                referenceEdr: referenceEdr,
+                currentEdr: currentEdr
+            )
+            let state = fadeState(for: displayId)
+            state.task?.cancel()
+            state.task = nil
+            cancelUpwardGammaAdjustment(displayId: displayId)
+            applyGammaTable(gammaTable, displayId: displayId, factor: factor)
+            state.appliedFactor = factor
+            state.targetFactor = factor
+            applied = true
+        }
+        return applied
     }
 
     func screenUpdate(screens: [NSScreen]) {

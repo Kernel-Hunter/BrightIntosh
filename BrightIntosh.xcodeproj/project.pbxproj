@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA000000000000000000001A /* KeysSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000019 /* KeysSettingsView.swift */; };
+		AA000000000000000000001B /* KeysSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000019 /* KeysSettingsView.swift */; };
+		AA0000000000000000000017 /* BrightnessHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* BrightnessHUD.swift */; };
+		AA0000000000000000000018 /* BrightnessHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* BrightnessHUD.swift */; };
+		AA0000000000000000000014 /* KeysSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* KeysSettings.swift */; };
+		AA0000000000000000000015 /* KeysSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* KeysSettings.swift */; };
+		AA0000000000000000000011 /* BrightnessCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000010 /* BrightnessCurve.swift */; };
+		AA0000000000000000000012 /* BrightnessCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000010 /* BrightnessCurve.swift */; };
+		AA00000000000000000000A2 /* BrightnessKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000A1 /* BrightnessKeys.swift */; };
+		AA00000000000000000000A3 /* BrightnessKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000A1 /* BrightnessKeys.swift */; };
 		1E05D3952B90E50E006FE96A /* StatusBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E05D3942B90E50E006FE96A /* StatusBarMenu.swift */; };
 		1E05D3962B90E50E006FE96A /* StatusBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E05D3942B90E50E006FE96A /* StatusBarMenu.swift */; };
 		9C17DFAB2DCF748000185CDA /* Cli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C17DFAA2DCF747D00185CDA /* Cli.swift */; };
@@ -143,6 +153,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA0000000000000000000019 /* KeysSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UI/KeysSettingsView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000016 /* BrightnessHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessHUD.swift; sourceTree = "<group>"; };
+		AA0000000000000000000013 /* KeysSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeysSettings.swift; sourceTree = "<group>"; };
+		AA0000000000000000000010 /* BrightnessCurve.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessCurve.swift; sourceTree = "<group>"; };
+		AA00000000000000000000A1 /* BrightnessKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrightnessKeys.swift; sourceTree = "<group>"; };
 		1E05D3942B90E50E006FE96A /* StatusBarMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarMenu.swift; sourceTree = "<group>"; };
 		9C17DFAA2DCF747D00185CDA /* Cli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cli.swift; sourceTree = "<group>"; };
 		9C17DFAD2DD0CA3200185CDA /* cli.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = cli.sh; sourceTree = "<group>"; };
@@ -296,6 +311,11 @@
 				9C17DFAD2DD0CA3200185CDA /* cli.sh */,
 				9C17DFAA2DCF747D00185CDA /* Cli.swift */,
 				C1DF94512A5EF20E00FA285F /* AppDelegate.swift */,
+				AA00000000000000000000A1 /* BrightnessKeys.swift */,
+				AA0000000000000000000019 /* KeysSettingsView.swift */,
+				AA0000000000000000000016 /* BrightnessHUD.swift */,
+				AA0000000000000000000013 /* KeysSettings.swift */,
+				AA0000000000000000000010 /* BrightnessCurve.swift */,
 				9CABC0012F60000000ABCDEF /* AppVersion.swift */,
 				9C9C78022A62AEE800778CAE /* Assets.xcassets */,
 				9C534AC72ACB06210029E050 /* AutomationManager.swift */,
@@ -504,6 +524,11 @@
 				9CCAC9392C3AF55F00B105D1 /* RestorePurchasesButton.swift in Sources */,
 				9C8FA26C2AB058310049C0D1 /* WelcomeWindow.swift in Sources */,
 				9C8803762A72625E00476017 /* AppDelegate.swift in Sources */,
+				AA00000000000000000000A2 /* BrightnessKeys.swift in Sources */,
+				AA000000000000000000001A /* KeysSettingsView.swift in Sources */,
+				AA0000000000000000000017 /* BrightnessHUD.swift in Sources */,
+				AA0000000000000000000014 /* KeysSettings.swift in Sources */,
+				AA0000000000000000000011 /* BrightnessCurve.swift in Sources */,
 				9C5610512ABF55A90066D6C9 /* BrightIntoshSettings.swift in Sources */,
 				9C1C8BEB2C8B4FC000754474 /* Trial.swift in Sources */,
 				9CE3C3822C8C8D3B00E7FDBA /* Styles.swift in Sources */,
@@ -547,6 +572,11 @@
 				9CABC0142F70000000ABCDEF /* GammaTechnique.swift in Sources */,
 				9CA026532AC968430068CC74 /* BrightnessTechnique.swift in Sources */,
 				C1B5215A2A5EFFDB00E9B7AC /* AppDelegate.swift in Sources */,
+				AA00000000000000000000A3 /* BrightnessKeys.swift in Sources */,
+				AA000000000000000000001B /* KeysSettingsView.swift in Sources */,
+				AA0000000000000000000018 /* BrightnessHUD.swift in Sources */,
+				AA0000000000000000000015 /* KeysSettings.swift in Sources */,
+				AA0000000000000000000012 /* BrightnessCurve.swift in Sources */,
 				9C5610502ABF55A90066D6C9 /* BrightIntoshSettings.swift in Sources */,
 				9C1C8BED2C8B817B00754474 /* BrightIntoshStore.swift in Sources */,
 				9CE3C3812C8C8D3B00E7FDBA /* Styles.swift in Sources */,

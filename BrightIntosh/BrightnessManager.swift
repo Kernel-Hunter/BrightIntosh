@@ -22,6 +22,7 @@ protocol BrightnessManaging: AnyObject {
     func appendSupportDiagnostics(to report: inout String)
     func protectedDataWillBecomeUnavailable()
     func protectedDataDidBecomeAvailable()
+    func applyBoostFast(_ boost: Float) -> Bool
 }
 
 @MainActor
@@ -575,6 +576,12 @@ final class BrightnessManager: BrightnessManaging {
         } else if stabilizationTask == nil {
             activateImmediately(reason: "display preference changed")
         }
+    }
+
+    func applyBoostFast(_ boost: Float) -> Bool {
+        guard activationRequested,
+              let technique = brightnessTechnique as? GammaTechnique else { return false }
+        return technique.applyBoostFast(boost: boost)
     }
 
     private func adjustBrightness() {

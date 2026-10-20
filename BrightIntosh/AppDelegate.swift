@@ -152,6 +152,13 @@ extension BrightIntoshAppDelegate: NSApplicationDelegate {
         
         // Register global hotkeys
         addKeyListeners()
+
+        // Brightness keys continue into the boost range. They need an event tap,
+        // which the sandboxed Store build cannot use.
+        #if !STORE
+        BrightIntoshSettings.shared.fineGrainedBrightnessControl = true
+        BrightnessKeys.shared.start(manager: brightnessManager)
+        #endif
         
         BrightIntoshSettings.shared.addListener(setting: "brightintoshActive") {
 #if swift(>=6.2)

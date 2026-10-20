@@ -618,6 +618,9 @@ struct SettingsTabs: View {
             BasicSettings().tabItem {
                 Text("General")
             }
+            KeysSettingsView().tabItem {
+                Text("Keys & Popup")
+            }
             Acknowledgments().tabItem {
                 Text("Acknowledgments")
             }
