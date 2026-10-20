@@ -1,6 +1,6 @@
-# BrightKeys
+# BrightIntosh with brightness keys
 
-BrightKeys is a fork of [BrightIntosh](https://github.com/niklasr22/BrightIntosh) by Niklas Rousset. It lets the brightness keys on a MacBook Pro continue past the normal maximum into the extra range of the XDR display, and shows a popup with the brightness in nits and percent.
+This is a fork of [BrightIntosh](https://github.com/niklasr22/BrightIntosh) by Niklas Rousset. It lets the brightness keys on a MacBook Pro continue past the normal maximum into the extra range of the XDR display, and shows a popup with the brightness in nits and percent.
 
 The brightness boost itself comes from BrightIntosh: an HDR overlay switches the display into its extended range, and a gamma table lifts SDR content into it. This fork adds the key handling, the popup and the settings around it. It is not affiliated with the upstream project.
 
@@ -26,8 +26,8 @@ I have only tested this on a MacBook Pro with an M5 chip (Mac17,2). Other models
 There are no binary releases yet, so you build it yourself. You need Xcode with the macOS 26 SDK.
 
 ```bash
-git clone https://github.com/Kernel-Hunter/BrightKeys.git
-cd BrightKeys
+git clone https://github.com/Kernel-Hunter/BrightIntosh.git
+cd BrightIntosh
 xcodebuild -project BrightIntosh.xcodeproj -scheme BrightIntosh -configuration Release \
   -derivedDataPath build CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build
 ```
