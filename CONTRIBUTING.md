@@ -1,22 +1,27 @@
-# Contributing to BrightIntosh
+# Contributing
 
-Thank you for your interest in contributing to BrightIntosh! We welcome issues and discussions from everyone, and here are some guidelines to get you started.
+Issues and pull requests are welcome.
 
-## Creating Issues
+## Before you open an issue
 
-If you encounter a bug, have a feature request, or want to discuss any aspect of BrightIntosh, please follow these steps to create an issue:
+- If the problem is in the brightness boost itself (the HDR overlay or the gamma table), it probably comes from upstream. Check [BrightIntosh's issues](https://github.com/niklasr22/BrightIntosh/issues) first.
+- If it is about the brightness keys, the popup, the settings or the nits, open an issue here.
+- Include your Mac model identifier (About This Mac, then System Report), your macOS version, and what you pressed and saw. A short screen recording helps for popup problems.
 
-1. Go to the [Issues](https://github.com/niklasr22/BrightIntosh/issues) section on our GitHub repository.
-2. Click the "New Issue" button.
-3. Fill in a clear and detailed description of the problem or feature request.
-4. Include any relevant information such as your operating system, Swift version, and steps to reproduce the issue.
+## Pull requests
 
-## Code of Conduct
+1. Fork the repository and create a branch from `main`.
+2. Keep the change small and focused. Match the style of the code around it.
+3. Run `swift test`. If you change `BrightnessCurve.swift`, add or update tests.
+4. Build the app with `xcodebuild` (see the README) and try the change on a real display. The key handling and the popup cannot be tested without one.
+5. Describe what changed and why in the pull request, and say which Mac and macOS version you tested on.
 
-We want BrightIntosh to be an open and welcoming community for all contributors. Please be respectful and considerate of others. Discrimination, harassment, and offensive behavior will not be tolerated.
+Add new Swift files to both app targets in `BrightIntosh.xcodeproj`, the regular one and the Store edition.
 
-Remember, we're all here to learn and collaborate. Let's make BrightIntosh better together!
+## Licensing
 
-If you have any questions or need assistance, feel free to reach out in the [GitHub discussions](https://github.com/niklasr22/BrightIntosh/discussions) or [X (Twitter)](http://x.com/BrightIntoshApp).
+By contributing you agree that your work is released under the GPL-3.0, the same license as the rest of the project.
 
-Thank you for contributing to BrightIntosh!
+## Conduct
+
+Be respectful. Harassment and discrimination are not tolerated, and maintainers may remove comments or ban people who engage in them.

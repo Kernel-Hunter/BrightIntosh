@@ -1,53 +1,82 @@
+# BrightKeys
 
-<p align="center">
-  <img width="256" height="256" alt="BrightIntosh-iOS-Default-256x256@1x" src="https://github.com/user-attachments/assets/02136d9a-11e1-49f8-bd16-8c23fe02acfc" />
-</p>
-<p align="center">
-  <a href="https://www.brightintosh.de">View our website</a><br/><br/>
-  <a href="https://apps.apple.com/app/apple-store/id6452471855?pt=126521145&ct=github&mt=8" style="display: inline-block;">
-    <img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1693267200" alt="Download on the App Store" style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain;" />
-  </a>
-</p>
+BrightKeys is a fork of [BrightIntosh](https://github.com/niklasr22/BrightIntosh) by Niklas Rousset. It lets the brightness keys on a MacBook Pro continue past the normal maximum into the extra range of the XDR display, and shows a popup with the brightness in nits and percent.
 
-# BrightIntosh
+The brightness boost itself comes from BrightIntosh: an HDR overlay switches the display into its extended range, and a gamma table lifts SDR content into it. This fork adds the key handling, the popup and the settings around it. It is not affiliated with the upstream project.
 
-BrightIntosh enables your MacBook Pro M1 (or newer) to use the increased brightness (1000 nits) of its XDR display at any time. By default, this is only possible when displaying HDR content.
-BrightIntosh can shift your brightness range to higher values.
-The brightness slider in the app controls how much you shift this range.
-You can still use your brightness keys to control the brightness.
-It comes with a handy menu bar item so you can toggle the increased brightness quickly and easily.
+## What changed from BrightIntosh
 
-> [!IMPORTANT]
-> This tool should not harm your display as it doesn't use any low-level API calls and your OS is in full control over the display, but there is no warranty.
+- The brightness keys run on one scale in nits. The first presses use the normal macOS slider. Once it reaches the maximum, each press raises the boost, up to a cap you choose (1600 nits by default).
+- Key presses are smooth. The key listener runs on its own thread, and a display-link ramp writes the system brightness and the boost every frame.
+- A square popup shows the bar, the nits and the percentage. On macOS 26 it uses Liquid Glass. Older versions get a blurred panel.
+- A Keys & Popup tab in Settings controls the step size, the maximum brightness, smoothing, and how the popup looks.
+- Accessibility options: the popup follows Reduce Transparency, Increase Contrast and Reduce Motion, can use larger text and a border, and can announce changes with VoiceOver.
+- The nits and step logic lives in `BrightnessCurve.swift` and has unit tests.
 
-## Preview
+## Requirements
 
-<p align="center">
-  <img src="https://github.com/niklasr22/BrightIntosh/assets/75939868/b8774d5c-7bfa-4661-86d0-e0e58fefbdf1">
-</p>
+- A MacBook Pro with a Liquid Retina XDR display. The supported model identifiers are the ones listed in `supportedDevices` in `BrightIntosh/Constants.swift`.
+- macOS 14.6 or later. The Liquid Glass popup needs macOS 26.
+- Accessibility permission, so the app can take over the brightness keys.
 
-Maximum brightness with BrightIntosh on the left half of the picture, default maximum brightness on the right half.
+I have only tested this on a MacBook Pro with an M5 chip (Mac17,2). Other models should behave the same, but I have not checked.
 
-## Compatible devices
+## Install
 
-- MacBook Pro M5 from 2025 / 2026 (Model identifier: Mac17,2, Mac17,6, Mac17,7, Mac17,8, Mac17,9) 
-- MacBook Pro M4 from 2024 (Model Identifiers: Mac16,1, Mac16,5, Mac16,6, Mac16,7, Mac16,8)
-- MacBook Pro M3 from 2023 (Model Identifiers: Mac15,3, Mac15,6, Mac15,7, Mac15,8, Mac15,9, Mac15,10, Mac15,11)
-- MacBook Pro M2 14" / 16" from 2023 (Model Identifiers: Mac14,5, Mac14,6, Mac14,9, Mac14,10)
-- MacBook Pro M1 14" / 16" from 2021 (Model Identifiers: MacBookPro18,1, MacBookPro18,2, MacBookPro18,3, MacBookPro18,4)
-- Studio Display XDR (experimental)
-- Pro Display XDR
+There are no binary releases yet, so you build it yourself. You need Xcode with the macOS 26 SDK.
 
-## Installation
+```bash
+git clone https://github.com/Kernel-Hunter/BrightKeys.git
+cd BrightKeys
+xcodebuild -project BrightIntosh.xcodeproj -scheme BrightIntosh -configuration Release \
+  -derivedDataPath build CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build
+```
 
-- [Mac App Store](https://apple.co/3r0Ghqm)
-- 👩🏼‍💻 Build it yourself 👨🏽‍💻
+The app ends up in `build/Build/Products/Release/BrightIntosh.app`. Sign it with a stable identity before you run it, for example your own development certificate:
 
-## Contributing
+```bash
+codesign --force --deep -s "Your Certificate Name" \
+  --entitlements BrightIntosh/BrightIntosh.entitlements build/Build/Products/Release/BrightIntosh.app
+```
 
-If you have any ideas, enhancements or proposals, feel free to open an issue!
+Sign with the same identity every time. macOS ties the Accessibility permission to the signature, so an ad hoc signature loses the permission on every rebuild.
 
-## Known incompatibilities and problems:
+On first launch, grant Accessibility access in System Settings, under Privacy & Security. If BrightIntosh is already listed but the keys do nothing, remove it with the minus button, add it again and switch it on.
 
-- BrightIntosh and [f.lux](https://justgetflux.com) will likely not work simultaneously
-- HDR Videos will clip when BrightIntosh is active
+## Using it
+
+Press the brightness keys as usual. Hold Shift and Option for smaller steps. Settings has a Keys & Popup tab, and its Preview button shows the popup without pressing a key.
+
+The default boost step is 100 nits per press. Lower it for finer control, for example 10 or 20 nits.
+
+## How accurate are the nits?
+
+They are estimates. No public macOS API reports luminance, so the app models it:
+
+- The panel peak is assumed to be 1600 nits.
+- SDR white at the full slider is the peak divided by the display's HDR headroom constant, about 600 nits on M3 and newer.
+- Below that, nits scale linearly with the slider.
+- Above it, the gamma factor scales the encoded signal, and light output is assumed to grow with the factor raised to 2.2.
+
+I have not checked these assumptions with a colorimeter. If you have one, measurements are welcome in an issue.
+
+1600 nits is the peak for small bright areas. The panel cannot hold that on a full white screen, and macOS may dim the display on its own when it gets hot.
+
+## Limitations
+
+- The app calls a private macOS API (`DisplayServices`) and runs without the App Sandbox, so it cannot ship on the Mac App Store. The Store target inherited from BrightIntosh does not include the key handling.
+- BrightIntosh and [f.lux](https://justgetflux.com) will likely not work together.
+- HDR video clips while the boost is active.
+- There is no warranty. The boost goes through the normal display pipeline, but running a display at peak brightness for long periods is your call.
+
+## Development
+
+```bash
+swift test
+```
+
+runs the unit tests for the brightness model. The app itself builds with `BrightIntosh.xcodeproj`. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you open a pull request.
+
+## License
+
+GPL-3.0, the same as BrightIntosh. The original copyright notices stay in the files they came from. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
